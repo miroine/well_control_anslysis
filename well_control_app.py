@@ -896,16 +896,24 @@ with tabs[4]:
         y_lists = [q_sens, bo_sens, pit_sens, ob_sens]
         pos     = [(1,1),(1,2),(2,1),(2,2)]
 
+        at_least_one = False
         for (row, col_p), y_data, color, flag in zip(pos, y_lists, colors, flags):
+            # Always add a trace (empty if unchecked) so subplot grid stays valid
+            fig_sens.add_trace(go.Scatter(
+                x=list(x_arr) if flag else [],
+                y=y_data if flag else [],
+                mode="lines",
+                line=dict(color=color, width=2.5),
+                showlegend=False,
+            ), row=row, col=col_p)
             if flag:
-                fig_sens.add_trace(go.Scatter(
-                    x=list(x_arr), y=y_data, mode="lines",
-                    line=dict(color=color, width=2.5)
-                ), row=row, col=col_p)
-                # Baseline marker
-                fig_sens.add_vline(x=base_val, line_dash="dot",
-                                   line_color=MID_GREY, opacity=0.7,
-                                   row=row, col=col_p)
+                at_least_one = True
+
+        # Baseline vertical line on all subplots
+        for row, col_p in pos:
+            fig_sens.add_vline(x=base_val, line_dash="dot",
+                               line_color=MID_GREY, opacity=0.6,
+                               row=row, col=col_p)
 
         fig_sens.update_xaxes(title_text=x_lbl_s)
         fig_sens.update_layout(
@@ -927,7 +935,8 @@ with tabs[4]:
         "Extent":           ("extent",    extent),
     }
     tornado_rows = []
-    base_q = darcy_flow_rate_m3_per_day(perm_md, thick, dp_bar, visc_cp, re, rw)
+    base_q_raw = darcy_flow_rate_m3_per_day(perm_md, thick, dp_bar, visc_cp, re, rw)
+    base_q_disp = m3_to_bbl(base_q_raw) if not use_si else base_q_raw
 
     for label, (pname, base) in tornado_params.items():
         lo_v, hi_v = base * 0.80, base * 1.20
@@ -950,24 +959,24 @@ with tabs[4]:
                 q2 = darcy_flow_rate_m3_per_day(perm_md, thick, dp_bar, visc_cp, variant, rw)
             results.append(q2)
         lo_q, hi_q = results
-        if not use_si:
-            lo_q, hi_q, base_q_d = m3_to_bbl(lo_q), m3_to_bbl(hi_q), m3_to_bbl(base_q)
-        else:
-            base_q_d = base_q
-        tornado_rows.append((label, lo_q - base_q_d, hi_q - base_q_d))
+        lo_q_d = m3_to_bbl(lo_q) if not use_si else lo_q
+        hi_q_d = m3_to_bbl(hi_q) if not use_si else hi_q
+        tornado_rows.append((label, lo_q_d - base_q_disp, hi_q_d - base_q_disp))
 
     tornado_rows.sort(key=lambda r: abs(r[2] - r[1]))
 
     fig_torn = go.Figure()
     for label, delta_lo, delta_hi in tornado_rows:
+        lo_val = min(delta_lo, delta_hi)
+        hi_val = max(delta_lo, delta_hi)
+        # Negative bar (low side, navy)
         fig_torn.add_trace(go.Bar(
-            y=[label], x=[min(delta_lo, delta_hi)],
+            y=[label], x=[lo_val],
             orientation="h", marker_color=DARK_NAVY, showlegend=False,
-            base=max(delta_lo, delta_hi),
         ))
+        # Positive bar (high side, red)
         fig_torn.add_trace(go.Bar(
-            y=[label], x=[max(delta_hi - delta_lo, delta_lo - delta_hi)],
-            base=min(delta_lo, delta_hi),
+            y=[label], x=[hi_val],
             orientation="h", marker_color=TORCH_RED, showlegend=False,
         ))
 
