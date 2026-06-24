@@ -26,94 +26,196 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STYLING
+# EQUINOR DESIGN TOKENS
 # ─────────────────────────────────────────────────────────────────────────────
-TORCH_RED   = "#EB0037"
-DARK_NAVY   = "#00243D"
-KARRY       = "#FFE7D6"
-PISTACHIO   = "#9DBA00"
-LIGHT_GREY  = "#F4F6F9"
-MID_GREY    = "#B0B8C1"
+TORCH_RED    = "#EB0037"   # primary accent
+DARK_NAVY    = "#00243D"   # primary dark / sidebar bg
+NAVY_MID     = "#003F6B"   # sidebar hover / chart secondary
+KARRY        = "#FFE7D6"   # warm highlight / sidebar text
+PISTACHIO    = "#9DBA00"   # positive / safe status
+SLATE        = "#F0F3F7"   # main canvas background
+WHITE        = "#FFFFFF"
+STEEL        = "#4A6378"   # body text
+SILVER       = "#C8D3DC"   # dividers / grid lines
+AMBER        = "#E07B00"   # warning
+CHART_BG     = "#FAFBFC"   # plot area
+
+# Plotly shared layout defaults
+def eq_layout(**kwargs):
+    base = dict(
+        font=dict(family="Inter, Equinor, Arial, sans-serif", color=STEEL, size=12),
+        plot_bgcolor=CHART_BG,
+        paper_bgcolor=WHITE,
+        margin=dict(t=30, b=40, l=50, r=30),
+        xaxis=dict(gridcolor=SILVER, linecolor=SILVER, zerolinecolor=SILVER,
+                   tickfont=dict(color=STEEL), title_font=dict(color=STEEL)),
+        yaxis=dict(gridcolor=SILVER, linecolor=SILVER, zerolinecolor=SILVER,
+                   tickfont=dict(color=STEEL), title_font=dict(color=STEEL)),
+        legend=dict(
+            bgcolor="rgba(255,255,255,0.85)", bordercolor=SILVER, borderwidth=1,
+            font=dict(color=STEEL, size=11), orientation="h", y=1.07, x=0
+        ),
+    )
+    base.update(kwargs)
+    return base
 
 st.markdown(f"""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+  /* ── Global canvas ── */
   html, body, [class*="css"] {{
       font-family: 'Inter', sans-serif;
-      background-color: {LIGHT_GREY};
+      background-color: {SLATE};
+      color: {STEEL};
+  }}
+  .main .block-container {{
+      padding-top: 1.5rem;
+      padding-bottom: 2rem;
+      max-width: 1400px;
   }}
 
-  /* Sidebar */
+  /* ── Sidebar ── */
   section[data-testid="stSidebar"] {{
       background-color: {DARK_NAVY} !important;
+      border-right: 1px solid {NAVY_MID};
   }}
-  section[data-testid="stSidebar"] * {{
-      color: {KARRY} !important;
-  }}
-  section[data-testid="stSidebar"] .stSlider > div > div > div > div {{
-      background-color: {TORCH_RED} !important;
+  section[data-testid="stSidebar"] > div {{ padding-top: 1rem; }}
+  section[data-testid="stSidebar"] p,
+  section[data-testid="stSidebar"] span,
+  section[data-testid="stSidebar"] div {{
+      color: #D0DCE8 !important;
   }}
   section[data-testid="stSidebar"] label {{
       color: {KARRY} !important;
-      font-size: 0.80rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      font-size: 0.72rem !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.08em !important;
+      text-transform: uppercase !important;
+  }}
+  /* Slider track */
+  section[data-testid="stSidebar"] .stSlider [data-baseweb="slider"] div[role="slider"] {{
+      background-color: {TORCH_RED} !important;
+      border-color: {TORCH_RED} !important;
+  }}
+  section[data-testid="stSidebar"] .stSlider [data-baseweb="slider"] > div > div:nth-child(2) {{
+      background: linear-gradient(to right, {TORCH_RED}, {TORCH_RED}) !important;
+  }}
+  /* Number inputs in sidebar */
+  section[data-testid="stSidebar"] input {{
+      background-color: {NAVY_MID} !important;
+      color: white !important;
+      border: 1px solid #1a5276 !important;
+      border-radius: 4px !important;
+  }}
+  section[data-testid="stSidebar"] .stMarkdown hr {{
+      border-color: {NAVY_MID} !important;
+      margin: 0.8rem 0 !important;
+  }}
+  /* Toggle */
+  section[data-testid="stSidebar"] .stToggle label span {{
+      color: {KARRY} !important;
+      font-size: 0.85rem !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      font-weight: 500 !important;
   }}
 
-  /* Header banner */
+  /* ── Hero banner ── */
   .hero {{
-      background: linear-gradient(135deg, {DARK_NAVY} 0%, #003a5c 100%);
-      border-left: 6px solid {TORCH_RED};
-      padding: 1.4rem 2rem;
-      border-radius: 0 8px 8px 0;
-      margin-bottom: 1.5rem;
+      background: linear-gradient(100deg, {DARK_NAVY} 0%, {NAVY_MID} 100%);
+      border-left: 5px solid {TORCH_RED};
+      padding: 1.5rem 2rem 1.3rem;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 1.6rem;
+      box-shadow: 0 4px 16px rgba(0,36,61,0.18);
   }}
   .hero h1 {{
-      color: white; font-size: 1.8rem; font-weight: 700; margin: 0;
+      color: {WHITE}; font-size: 1.75rem; font-weight: 700;
+      margin: 0; letter-spacing: -0.02em;
   }}
   .hero p {{
-      color: {KARRY}; font-size: 0.9rem; margin: 0.3rem 0 0;
+      color: {KARRY}; font-size: 0.88rem; margin: 0.35rem 0 0;
+      font-weight: 400; letter-spacing: 0.01em;
   }}
 
-  /* KPI cards */
-  .kpi-row {{ display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }}
+  /* ── KPI cards ── */
   .kpi-card {{
-      flex: 1; min-width: 150px;
-      background: white;
-      border-radius: 8px;
-      padding: 1.1rem 1.4rem;
-      border-top: 4px solid {DARK_NAVY};
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      background: {WHITE};
+      border-radius: 6px;
+      padding: 1rem 1.2rem 0.9rem;
+      border-top: 3px solid {DARK_NAVY};
+      box-shadow: 0 1px 4px rgba(0,36,61,0.08);
   }}
   .kpi-card.red   {{ border-top-color: {TORCH_RED}; }}
   .kpi-card.green {{ border-top-color: {PISTACHIO}; }}
-  .kpi-card.amber {{ border-top-color: #F5A623; }}
-  .kpi-value {{ font-size: 1.55rem; font-weight: 700; color: {DARK_NAVY}; }}
-  .kpi-label {{ font-size: 0.72rem; font-weight: 600; color: {MID_GREY};
-                letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }}
+  .kpi-card.amber {{ border-top-color: {AMBER}; }}
+  .kpi-value {{
+      font-size: 1.45rem; font-weight: 700; color: {DARK_NAVY};
+      letter-spacing: -0.02em; line-height: 1.2;
+  }}
+  .kpi-label {{
+      font-size: 0.68rem; font-weight: 600; color: {STEEL};
+      letter-spacing: 0.07em; text-transform: uppercase; margin-top: 4px;
+  }}
 
-  /* Section headers */
+  /* ── Section headers ── */
   .section-hdr {{
       border-bottom: 2px solid {TORCH_RED};
-      padding-bottom: 0.3rem; margin-top: 1.6rem; margin-bottom: 1rem;
-      color: {DARK_NAVY}; font-weight: 700; font-size: 1.05rem;
+      padding-bottom: 0.25rem; margin-top: 1.4rem; margin-bottom: 0.9rem;
+      color: {DARK_NAVY}; font-weight: 700; font-size: 0.98rem;
+      letter-spacing: -0.01em;
   }}
 
-  /* Risk badge */
+  /* ── Risk badges ── */
   .badge {{
-      display: inline-block; padding: 4px 14px; border-radius: 20px;
-      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.07em;
+      display: inline-block; padding: 3px 12px; border-radius: 3px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
       text-transform: uppercase;
   }}
-  .badge-ok   {{ background: #e8f5e9; color: #2e7d32; }}
-  .badge-warn {{ background: #fff3e0; color: #e65100; }}
-  .badge-crit {{ background: #ffebee; color: #b71c1c; }}
+  .badge-ok   {{ background: #EBF5E1; color: #3D6B0A; border: 1px solid #9DBA00; }}
+  .badge-warn {{ background: #FFF4E0; color: #7A4400; border: 1px solid {AMBER}; }}
+  .badge-crit {{ background: #FDEDF1; color: #8B001E; border: 1px solid {TORCH_RED}; }}
 
-  div[data-testid="stTabs"] button {{ color: {DARK_NAVY} !important; font-weight: 600; }}
+  /* ── Tabs ── */
+  div[data-testid="stTabs"] [role="tablist"] {{
+      border-bottom: 2px solid {SILVER};
+      gap: 0;
+  }}
+  div[data-testid="stTabs"] button {{
+      color: {STEEL} !important; font-weight: 500 !important;
+      font-size: 0.88rem !important; padding: 0.5rem 1rem !important;
+      border-radius: 0 !important; border: none !important;
+      border-bottom: 2px solid transparent !important;
+      margin-bottom: -2px !important;
+      background: transparent !important;
+  }}
+  div[data-testid="stTabs"] button:hover {{
+      color: {DARK_NAVY} !important;
+      background: rgba(0,36,61,0.04) !important;
+  }}
   div[data-testid="stTabs"] button[aria-selected="true"] {{
-      border-bottom: 3px solid {TORCH_RED} !important; color: {TORCH_RED} !important;
+      color: {TORCH_RED} !important; font-weight: 700 !important;
+      border-bottom: 2px solid {TORCH_RED} !important;
+      background: transparent !important;
+  }}
+
+  /* ── Dataframes ── */
+  .stDataFrame {{ border: 1px solid {SILVER}; border-radius: 6px; overflow: hidden; }}
+
+  /* ── Info / warning boxes ── */
+  .stAlert {{ border-radius: 6px !important; border-left-width: 4px !important; }}
+
+  /* ── Download button ── */
+  .stDownloadButton button {{
+      background-color: {DARK_NAVY} !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 4px !important;
+      font-weight: 600 !important;
+  }}
+  .stDownloadButton button:hover {{
+      background-color: {TORCH_RED} !important;
   }}
 </style>
 """, unsafe_allow_html=True)
@@ -403,7 +505,7 @@ with tabs[0]:
     # Reservoir marker
     res_pp_disp = bar_to_psi(pore_pres) if not use_si else pore_pres
     res_d_disp  = m_to_ft(tvd) if not use_si else tvd
-    fig1.add_hline(y=res_d_disp, line_dash="dot", line_color=MID_GREY, opacity=0.6,
+    fig1.add_hline(y=res_d_disp, line_dash="dot", line_color=SILVER, opacity=0.8,
                    annotation_text="Reservoir top", annotation_position="right")
 
     # Shaded overbalance / underbalance
@@ -420,13 +522,13 @@ with tabs[0]:
             line=dict(width=0), name="Underbalance zone", showlegend=True
         ))
 
-    fig1.update_layout(
-        yaxis=dict(autorange="reversed", title=y_lbl, gridcolor="#e0e0e0"),
-        xaxis=dict(title=x_lbl, gridcolor="#e0e0e0"),
-        plot_bgcolor="white", paper_bgcolor="white",
-        legend=dict(orientation="h", y=1.05),
-        height=500, margin=dict(t=30)
-    )
+    fig1.update_layout(**eq_layout(
+        yaxis=dict(autorange="reversed", title=y_lbl, gridcolor=SILVER, linecolor=SILVER,
+                   zerolinecolor=SILVER, tickfont=dict(color=STEEL), title_font=dict(color=STEEL)),
+        xaxis=dict(title=x_lbl, gridcolor=SILVER, linecolor=SILVER,
+                   zerolinecolor=SILVER, tickfont=dict(color=STEEL), title_font=dict(color=STEEL)),
+        height=500,
+    ))
     st.plotly_chart(fig1, use_container_width=True)
 
     # Pressure gradient table
@@ -496,12 +598,9 @@ with tabs[1]:
         fig2.add_trace(go.Scatter(x=[mark_x], y=[mark_y], mode="markers",
                                   marker=dict(color=TORCH_RED, size=12, symbol="star"),
                                   name=f"Current ΔP → {disp_rate(q_m3day)}"))
-        fig2.update_layout(
-            xaxis_title=x_l, yaxis_title=y_l,
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=360, margin=dict(t=20),
-            legend=dict(orientation="h", y=1.05)
-        )
+        fig2.update_layout(**eq_layout(
+            xaxis_title=x_l, yaxis_title=y_l, height=380,
+        ))
         st.plotly_chart(fig2, use_container_width=True)
 
     with col2:
@@ -519,19 +618,16 @@ with tabs[1]:
         det_vol = m3_to_bbl(pit_m3) if not use_si else pit_m3
         fig3.add_vline(x=react_hr, line_dash="dot", line_color=PISTACHIO,
                        annotation_text=f"Detection at {react_hr:.1f} hr", annotation_position="top right")
-        fig3.add_hline(y=det_vol, line_dash="dot", line_color="#F5A623",
+        fig3.add_hline(y=det_vol, line_dash="dot", line_color=AMBER,
                        annotation_text=f"Pit gain = {disp_vol(pit_m3)}")
         # Wellbore capacity line
         wb_disp = m3_to_bbl(wbs_m3) if not use_si else wbs_m3
-        fig3.add_hline(y=wb_disp, line_dash="dash", line_color=DARK_NAVY, opacity=0.4,
+        fig3.add_hline(y=wb_disp, line_dash="dash", line_color=NAVY_MID, opacity=0.5,
                        annotation_text="Wellbore capacity", annotation_position="right")
 
-        fig3.update_layout(
-            xaxis_title="Time (hr)", yaxis_title=y_vol_lbl,
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=360, margin=dict(t=20),
-            legend=dict(orientation="h", y=1.05)
-        )
+        fig3.update_layout(**eq_layout(
+            xaxis_title="Time (hr)", yaxis_title=y_vol_lbl, height=380,
+        ))
         st.plotly_chart(fig3, use_container_width=True)
 
     # Volume summary
@@ -583,12 +679,9 @@ with tabs[2]:
         fig4.add_trace(go.Scatter(x=[cur_m], y=[cur_y], mode="markers",
                                   marker=dict(color=TORCH_RED, size=12, symbol="star"),
                                   name=f"Selected: {disp_sg(kill_sg)}"))
-        fig4.update_layout(
-            xaxis_title="Safety margin (S.G.)",
-            yaxis_title=y_lbl2,
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=350, margin=dict(t=20),
-        )
+        fig4.update_layout(**eq_layout(
+            xaxis_title="Safety margin (S.G.)", yaxis_title=y_lbl2, height=370,
+        ))
         st.plotly_chart(fig4, use_container_width=True)
 
     with col2:
@@ -601,16 +694,14 @@ with tabs[2]:
             x=list(k_range), y=bi_range,
             line=dict(color=TORCH_RED, width=2.5), name="BO severity index"
         ))
-        fig5.add_hline(y=0.7, line_dash="dot", line_color="#F5A623",
+        fig5.add_hline(y=0.7, line_dash="dot", line_color=AMBER,
                        annotation_text="High risk threshold")
         fig5.add_vline(x=perm_md, line_dash="dash", line_color=PISTACHIO,
                        annotation_text=f"k={perm_md:.0f} mD", annotation_position="top right")
-        fig5.update_layout(
+        fig5.update_layout(**eq_layout(
             xaxis_title="Permeability (mD)", xaxis_type="log",
-            yaxis_title="Blowout severity index",
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=350, margin=dict(t=20),
-        )
+            yaxis_title="Blowout severity index", height=370,
+        ))
         st.plotly_chart(fig5, use_container_width=True)
 
     # Kill procedure steps
@@ -728,7 +819,7 @@ with tabs[3]:
     # Annotations with arrows
     ann_common = dict(arrowhead=2, arrowcolor=TORCH_RED, arrowwidth=1.5,
                       font=dict(size=10, color=DARK_NAVY),
-                      bgcolor="rgba(255,255,255,0.85)", bordercolor=MID_GREY)
+                      bgcolor="rgba(255,255,255,0.92)", bordercolor=SILVER, borderpad=4)
 
     # Mud weight label
     fig_sk.add_annotation(x=wx*2, y=(d_surf_d + d_res_d)/2,
@@ -765,18 +856,21 @@ with tabs[3]:
     for label, depth in [("Surface/seabed", d_surf_d), ("Res. top", d_res_d),
                           ("Res. base", d_bot_d)]:
         fig_sk.add_shape(type="line", x0=0.85, x1=1.0, y0=depth, y1=depth,
-                         line=dict(color=MID_GREY, dash="dot"))
+                         line=dict(color=SILVER, dash="dot"))
         fig_sk.add_annotation(x=1.05, y=depth,
                                text=f"{label}<br>{depth:.0f} {depth_unit}",
-                               showarrow=False, font=dict(size=9, color="#555"),
+                               showarrow=False, font=dict(size=9, color=STEEL),
                                xanchor="left")
 
     fig_sk.update_layout(
         xaxis=dict(visible=False, range=[-1.3, 1.6]),
         yaxis=dict(autorange="reversed", title=f"Depth ({depth_unit})",
-                   range=[-bh_d*0.05, bh_d*1.05]),
-        plot_bgcolor="white", paper_bgcolor="white",
-        height=650, margin=dict(t=20, l=20, r=130),
+                   range=[-bh_d*0.05, bh_d*1.05],
+                   gridcolor=SILVER, tickfont=dict(color=STEEL),
+                   title_font=dict(color=STEEL)),
+        plot_bgcolor=CHART_BG, paper_bgcolor=WHITE,
+        font=dict(family="Inter, Arial, sans-serif", color=STEEL),
+        height=680, margin=dict(t=20, l=20, r=140),
         showlegend=False,
     )
     st.plotly_chart(fig_sk, use_container_width=True)
@@ -912,13 +1006,17 @@ with tabs[4]:
         # Baseline vertical line on all subplots
         for row, col_p in pos:
             fig_sens.add_vline(x=base_val, line_dash="dot",
-                               line_color=MID_GREY, opacity=0.6,
+                               line_color=SILVER, opacity=0.9,
                                row=row, col=col_p)
 
-        fig_sens.update_xaxes(title_text=x_lbl_s)
+        fig_sens.update_xaxes(title_text=x_lbl_s, gridcolor=SILVER, linecolor=SILVER,
+                               tickfont=dict(color=STEEL), title_font=dict(color=STEEL))
+        fig_sens.update_yaxes(gridcolor=SILVER, linecolor=SILVER,
+                               tickfont=dict(color=STEEL))
         fig_sens.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=600, margin=dict(t=40),
+            plot_bgcolor=CHART_BG, paper_bgcolor=WHITE,
+            font=dict(family="Inter, Arial, sans-serif", color=STEEL, size=12),
+            height=600, margin=dict(t=50, b=40, l=50, r=30),
             showlegend=False,
         )
         st.plotly_chart(fig_sens, use_container_width=True)
@@ -954,7 +1052,7 @@ with tabs[4]:
             elif pname == "thick":
                 q2 = darcy_flow_rate_m3_per_day(perm_md, variant, dp_bar, visc_cp, re, rw)
             elif pname == "poros_frac":
-                q2 = base_q   # porosity doesn't affect Darcy rate
+                q2 = base_q_raw   # porosity doesn't affect Darcy rate
             elif pname == "extent":
                 q2 = darcy_flow_rate_m3_per_day(perm_md, thick, dp_bar, visc_cp, variant, rw)
             results.append(q2)
@@ -981,12 +1079,17 @@ with tabs[4]:
         ))
 
     fig_torn.add_vline(x=0, line_color=DARK_NAVY, line_width=2)
-    fig_torn.update_layout(
+    fig_torn.update_layout(**eq_layout(
         barmode="overlay",
         xaxis_title=f"Δ Influx rate ({UL['rate']}) vs base",
-        plot_bgcolor="white", paper_bgcolor="white",
-        height=350, margin=dict(t=10)
-    )
+        height=360,
+        legend=dict(
+            bgcolor="rgba(255,255,255,0.85)", bordercolor=SILVER, borderwidth=1,
+            font=dict(color=STEEL, size=11),
+            orientation="h", y=1.07, x=0,
+            traceorder="normal"
+        ),
+    ))
     st.plotly_chart(fig_torn, use_container_width=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1042,7 +1145,7 @@ with tabs[5]:
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("---")
 st.markdown(
-    f"<div style='color:{MID_GREY};font-size:0.75rem;text-align:center;'>"
+    f"<div style='color:{SILVER};font-size:0.75rem;text-align:center;padding:0.5rem 0;'>"
     f"Well Control & Influx Analyser · MIT licence · Engineering use only — not a substitute for "
     f"certified well control procedures (IWCF/IADC). All calculations based on Darcy radial flow, "
     f"hydrostatic pressure balance, and standard well control principles."
